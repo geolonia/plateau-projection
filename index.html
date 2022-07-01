@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>PLATEAU Shibuya projection</title>
+	<title>PLATEAU projection</title>
 	<style>
 		html, body, #map {
 			width: 100%;
@@ -17,24 +17,32 @@
 <body>
 	<div
 		id="map"
-		data-zoom="14"
-		data-lat="35.66758"
-		data-lng="139.69775"
 		data-marker="off"
+		data-hash="on"
 	></div>
 	<script src="https://cdn.geolonia.com/dev/embed?geolonia-api-key=YOUR-API-KEY"></script>
 	<script>
 		const map = new window.geolonia.Map('#map')
 		const base = window.location.origin + window.location.pathname + 'tiles'
+		const attribution = "<a href=\"https://www.mlit.go.jp/plateau/site-policy/\">PLATEAU</a>（国土交通省）のデータを加工して作成"
+		const beforeLayer = 'poi-z16'
+
 		map.on('load', () => {
 			map.addSource('plateau-shibuya', {
 				type: 'vector',
-				tiles: [`${base}/{z}/{x}/{y}.mvt`],
-				attribution: "<a href=\"https://www.mlit.go.jp/plateau/site-policy/\">PLATEAU</a>（国土交通省）のデータを加工して作成",
+				tiles: [`${base}/shibuya/{z}/{x}/{y}.mvt`],
+				attribution,
 				maxzoom: 14,
 			})
+			map.addSource('plateau-iwaki', {
+				type: 'vector',
+				tiles: [`${base}/iwaki/{z}/{x}/{y}.mvt`],
+				attribution,
+				maxzoom: 14,
+			})
+
 			map.addLayer({
-				id: `plateau-shibuya-polygon`,
+				id: 'plateau-shibuya-polygon',
 				type: 'fill',
 				source: 'plateau-shibuya',
 				'source-layer': 'plateau-shibuya',
@@ -43,7 +51,19 @@
 					'fill-opacity': 0.6
 				},
 				maxzoom: 22,
-			}, 'poi-z16')
+			}, beforeLayer)
+
+			map.addLayer({
+				id: 'plateau-iwaki-polygon',
+				type: 'fill',
+				source: 'plateau-iwaki',
+				'source-layer': 'plateau-iwaki',
+				paint: {
+					'fill-color': 'darkorange',
+					'fill-opacity': 0.6
+				},
+				maxzoom: 22,
+			}, beforeLayer)
 		})
 	</script>
 </body>
