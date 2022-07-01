@@ -12,6 +12,10 @@
 			padding: 0;
 			margin: 0;
 		}
+		.opacity-control-container {
+			display: flex;
+			align-items: center;
+		}
 	</style>
 </head>
 <body>
@@ -29,7 +33,44 @@
 		const attribution = "<a href=\"https://www.mlit.go.jp/plateau/site-policy/\">PLATEAU</a>（国土交通省）のデータを加工して作成"
 		const beforeLayer = 'poi-z16'
 
+		class OpacityControl {
+			constructor(targetLayers) {
+				this.targetLayers = targetLayers
+			}
+			onAdd(map) {
+				const container = document.createElement('div')
+				const label = document.createElement('label')
+				const slider = document.createElement('input')
+				container.appendChild(label)
+				container.appendChild(slider)
+
+				container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group maplibregl-ctrl maplibregl-ctrl-group opacity-control-container'
+				label.for = 'opacity-slider'
+				label.textContent = 'Opacity: '
+				slider.id = label.for
+				slider.type = 'range'
+				slider.min = 0
+				slider.max = 1
+				slider.step = 0.01
+				slider.value = 0.6
+
+				this.slider = slider
+				slider.addEventListener('input', (e) => {
+					const opacity = parseFloat(e.target.value)
+					this.targetLayers.forEach(layer_id => map.setPaintProperty(layer_id, 'fill-opacity', opacity))
+				})
+				return container
+			}
+			get opacity() {
+				return this.slider.value
+			}
+			remove() {}
+		}
+
 		map.on('load', () => {
+			const opacityControl = new OpacityControl(['plateau-shibuya-polygon', 'plateau-iwaki-polygon'])
+			map.addControl(opacityControl, 'top-left')
+
 			map.addSource('plateau-shibuya', {
 				type: 'vector',
 				tiles: [`${base}/shibuya/{z}/{x}/{y}.mvt`],
@@ -50,7 +91,7 @@
 				'source-layer': 'plateau-shibuya',
 				paint: {
 					'fill-color': 'darkblue',
-					'fill-opacity': 0.6
+					'fill-opacity': parseFloat(opacityControl.opacity)
 				},
 				maxzoom: 22,
 			}, beforeLayer)
@@ -62,7 +103,7 @@
 				'source-layer': 'plateau-iwaki',
 				paint: {
 					'fill-color': 'darkorange',
-					'fill-opacity': 0.6
+					'fill-opacity': parseFloat(opacityControl.opacity)
 				},
 				maxzoom: 22,
 			}, beforeLayer)
