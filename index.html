@@ -66,6 +66,9 @@
 				},
 				maxzoom: 22,
 			}, beforeLayer)
+
+			const layer = map.getStyle().layers.find(layer => layer.id === 'building' && layer.source === 'gsi-japan')
+			map.setLayerZoomRange('building', 13, layer.maxzoom);
 		})
 	</script>
 </body>
