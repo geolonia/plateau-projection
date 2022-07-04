@@ -28,49 +28,28 @@
 		data-zoom="13"
 	></div>
 	<script src="https://cdn.geolonia.com/dev/embed?geolonia-api-key=YOUR-API-KEY"></script>
-	<script>
+	<script src="./controls.js" type="module"></script>
+	<script type="module">
+		import { OpacityControl, SatelliteToggleControl } from './controls.js'
+
 		const map = new window.geolonia.Map('#map')
 		const base = window.location.origin + window.location.pathname + 'tiles'
 		const attribution = "<a href=\"https://www.mlit.go.jp/plateau/site-policy/\">PLATEAU</a>（国土交通省）のデータを加工して作成"
 		const beforeLayer = 'poi-z16'
 
-		class OpacityControl {
-			constructor(targetLayers) {
-				this.targetLayers = targetLayers
-			}
-			onAdd(map) {
-				const container = document.createElement('div')
-				const label = document.createElement('label')
-				const slider = document.createElement('input')
-				container.appendChild(label)
-				container.appendChild(slider)
-
-				container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group maplibregl-ctrl maplibregl-ctrl-group opacity-control-container'
-				label.for = 'opacity-slider'
-				label.textContent = 'Opacity: '
-				slider.id = label.for
-				slider.type = 'range'
-				slider.min = 0
-				slider.max = 1
-				slider.step = 0.01
-				slider.value = 0.3
-
-				this.slider = slider
-				slider.addEventListener('input', (e) => {
-					const opacity = parseFloat(e.target.value)
-					this.targetLayers.forEach(layer_id => map.setPaintProperty(layer_id, 'fill-opacity', opacity))
-				})
-				return container
-			}
-			get opacity() {
-				return this.slider.value
-			}
-			remove() {}
-		}
-
 		map.on('load', () => {
+
 			const opacityControl = new OpacityControl(['plateau-shibuya-polygon', 'plateau-iwaki-polygon'])
+			const satelliteToggleControl = new SatelliteToggleControl('gsi-seamlessphoto-raster')
+
 			map.addControl(opacityControl, 'top-left')
+			map.addControl(satelliteToggleControl, 'top-left')
+
+			map.addSource('gsi-seamlessphoto', {
+				type: 'raster',
+				tiles: ['https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'],
+				attribution: '<a href="https://www.gsi.go.jp/" target="_blank">&copy; GSI Japan</a>',
+			})
 
 			map.addSource('plateau-shibuya', {
 				type: 'vector',
@@ -78,6 +57,7 @@
 				attribution,
 				maxzoom: 14,
 			})
+
 			map.addSource('plateau-iwaki', {
 				type: 'vector',
 				tiles: [`${base}/iwaki/{z}/{x}/{y}.mvt`],
@@ -86,12 +66,23 @@
 			})
 
 			map.addLayer({
+				id: 'gsi-seamlessphoto-raster',
+				type: 'raster',
+				source: 'gsi-seamlessphoto',
+				minzoom: 0,
+				maxzoom: 22,
+				layout: {
+					visibility: 'none'
+				}
+			}, beforeLayer)
+
+			map.addLayer({
 				id: 'plateau-shibuya-polygon',
 				type: 'fill',
 				source: 'plateau-shibuya',
 				'source-layer': 'plateau-shibuya',
 				paint: {
-					'fill-color': 'darkblue',
+					'fill-color': 'sienna',
 					'fill-outline-color': 'black',
 					'fill-opacity': parseFloat(opacityControl.opacity)
 				},
@@ -114,8 +105,8 @@
 			// overwwrite geoloniamaps/gsi style
 			const buildingLayer = map.getStyle().layers.find(layer => layer.id === 'building' && layer.source === 'gsi-japan')
 			const structureLayer = map.getStyle().layers.find(layer => layer.id === 'structure' && layer.source === 'gsi-japan')
-			map.setLayerZoomRange('building', 13, buildingLayer.maxzoom);
-			map.setLayerZoomRange('structurea', 13, structureLayer.maxzoom);
+			buildingLayer && map.setLayerZoomRange('building', 13, buildingLayer.maxzoom);
+			structureLayer && map.setLayerZoomRange('structurea', 13, structureLayer.maxzoom);
 		})
 	</script>
 </body>
