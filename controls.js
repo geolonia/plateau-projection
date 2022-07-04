@@ -17,12 +17,12 @@ export class OpacityControl {
 		slider.min = 0
 		slider.max = 1
 		slider.step = 0.01
-		slider.value = 0.3
+		slider.value = 0.8
 
 		this.slider = slider
 		slider.addEventListener('input', (e) => {
 			const opacity = parseFloat(e.target.value)
-			this.targetLayers.forEach(layer_id => map.setPaintProperty(layer_id, 'fill-opacity', opacity))
+			this.targetLayers.forEach(layer_id => map.setPaintProperty(layer_id, 'line-opacity', opacity))
 		})
 		return container
 	}

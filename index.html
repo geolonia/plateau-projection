@@ -39,7 +39,7 @@
 
 		map.on('load', () => {
 
-			const opacityControl = new OpacityControl(['plateau-shibuya-polygon', 'plateau-iwaki-polygon'])
+			const opacityControl = new OpacityControl(['plateau-shibuya-line', 'plateau-iwaki-line'])
 			const satelliteToggleControl = new SatelliteToggleControl('gsi-seamlessphoto-raster')
 
 			map.addControl(opacityControl, 'top-left')
@@ -77,27 +77,27 @@
 			}, beforeLayer)
 
 			map.addLayer({
-				id: 'plateau-shibuya-polygon',
-				type: 'fill',
+				id: 'plateau-shibuya-line',
+				type: 'line',
 				source: 'plateau-shibuya',
 				'source-layer': 'plateau-shibuya',
 				paint: {
-					'fill-color': 'sienna',
-					'fill-outline-color': 'black',
-					'fill-opacity': parseFloat(opacityControl.opacity)
+					'line-color': 'red',
+					'line-width': 1.5,
+					'line-opacity': parseFloat(opacityControl.opacity),
 				},
 				maxzoom: 22,
 			}, beforeLayer)
 
 			map.addLayer({
-				id: 'plateau-iwaki-polygon',
-				type: 'fill',
+				id: 'plateau-iwaki-line',
+				type: 'line',
 				source: 'plateau-iwaki',
 				'source-layer': 'plateau-iwaki',
 				paint: {
-					'fill-color': 'sienna',
-					'fill-outline-color': 'black',
-					'fill-opacity': parseFloat(opacityControl.opacity)
+					'line-color': 'red',
+					'line-width': 1.5,
+					'line-opacity': parseFloat(opacityControl.opacity),
 				},
 				maxzoom: 22,
 			}, beforeLayer)
@@ -105,6 +105,7 @@
 			// overwwrite geoloniamaps/gsi style
 			const buildingLayer = map.getStyle().layers.find(layer => layer.id === 'building' && layer.source === 'gsi-japan')
 			const structureLayer = map.getStyle().layers.find(layer => layer.id === 'structure' && layer.source === 'gsi-japan')
+			buildingLayer && map.setPaintProperty('building', 'fill-color', 'khaki')
 			buildingLayer && map.setLayerZoomRange('building', 13, buildingLayer.maxzoom);
 			structureLayer && map.setLayerZoomRange('structurea', 13, structureLayer.maxzoom);
 		})
