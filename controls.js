@@ -42,7 +42,7 @@ export class SatelliteToggleControl {
 		container.appendChild(button)
 
 		container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group maplibregl-ctrl maplibregl-ctrl-group sattelite-toggle-control-container'
-		button.textContent = '🛰'
+		button.textContent = '衛星画像切替'
 		button.addEventListener('click', () => {
 			const nextVisibility = map.getLayoutProperty(this.targetLayer, 'visibility') === 'none' ? 'visible' : 'none'
 			map.setLayoutProperty(this.targetLayer, 'visibility', nextVisibility)
