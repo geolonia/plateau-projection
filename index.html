@@ -65,6 +65,14 @@
 				maxzoom: 14,
 			})
 
+			map.addSource('shibuya-br', {
+				type: 'vector',
+				tiles: [`${base}/shibuya-br/{z}/{x}/{y}.mvt`],
+				attribution,
+				// minzoom: 14,
+				maxzoom: 22,
+			})
+
 			map.addLayer({
 				id: 'gsi-seamlessphoto-raster',
 				type: 'raster',
@@ -101,6 +109,19 @@
 				},
 				maxzoom: 22,
 			}, beforeLayer)
+
+			map.addLayer({
+				id: 'shibuya-br-point',
+				type: 'circle',
+				source: 'shibuya-br',
+				'source-layer': 'shibuya-br',
+				paint: {
+					'circle-radius': 4,
+					'circle-color': 'darkblue',
+				},
+				minzoom: 16,
+				maxzoom: 22,
+			})
 
 			// overwwrite geoloniamaps/gsi style
 			const buildingLayer = map.getStyle().layers.find(layer => layer.id === 'building' && layer.source === 'gsi-japan')
